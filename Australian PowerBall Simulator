@@ -1,0 +1,108 @@
+"""
+###Python###
+This Australian PowerBall simulator is designed to replicate the authentic experience of gambling in Austalia.
+This project was created as a tool to provide a realistic feel for how likely an individual might be to making any real money from playing Australian PowerBall. (No, extremely unlikely)
+It was also designed to answer the question; can you get a positive monetary return if you invested enough money on playing the Australian PowerBall. (Also, no. That's rediculous that you would ever consider that, you should be ashamed of yourself for thinking something so stupid)
+
+The winning ammounts have been taken from the average winning ammounts from each division of the Austrtalian PowerBall.
+This information is publicly available on the Australia National Lottery website (URL: https://australia.national-lottery.com/powerball/dividends)
+
+================================================================================
+INSTRUCTIONS:
+- Change the number of "tickets_per_game" to the number of tickets you want (each ticket costs $1.35)
+- Change the number of  "num_games" to the number of games you want to play 
+  (i.e. that means if you have 10 tickets in 10 games this will be 100 tickets)
+
+- Once you are happy with your number press the "Run" button (the Play icon in the top left of this message block), or press "Shift"+"Enter"
+
+You can see how much you spent and won (as well as a breakdown of which divisions you won in) down the bottom.
+================================================================================
+"""
+import random
+import json
+
+white_ball = list(range(1, 36))
+power_ball = list(range(1, 21))
+
+#Change this for the number of tickets you buy per game
+tickets_per_game = 10000
+#Change this for the number of games you want to play (for the number of tickets you bought)
+num_games = 100
+
+total_spent = 0
+earnings = 0
+
+times_won = {
+    "7+P": 0,
+    "7": 0,
+    "6+P": 0,
+    "6": 0,
+    "5+P": 0,
+    "5": 0,
+    "4+P": 0,
+    "3+P": 0,
+    "2+P": 0
+}
+
+def calc_win_amt(my_numbers, winning_numbers):
+  win_amt = 0
+
+  white_matches = len(my_numbers['whites'].intersection(winning_numbers['whites']))
+  power_matches = my_numbers['red'] == winning_numbers['red']
+
+  if white_matches == 7:
+    if power_matches:
+      win_amt = 22852522.41
+      times_won['7+P'] += 1
+    else:
+      win_amt = 128161.72
+      times_won['7'] += 1
+  elif white_matches == 6:
+      if power_matches:
+        win_amt = 6026.19
+        times_won['6+P'] += 1
+      else:
+        win_amt = 459.55
+        times_won['6'] += 1
+  elif white_matches == 5:
+      if power_matches:
+        win_amt = 160.45
+        times_won['5+P'] += 1
+      else:
+        win_amt = 42.51 
+        times_won['5'] += 1
+  elif white_matches == 4:
+      if power_matches:
+        win_amt = 71.58 
+        times_won['4+P'] += 1
+  elif white_matches == 3:
+      if power_matches:
+        win_amt = 17.89 
+        times_won['3+P'] += 1
+  elif white_matches == 2:
+      if power_matches:
+        win_amt = 10.88 
+        times_won['2+P'] += 1
+
+  return win_amt
+
+for x in range(num_games):
+  white_drawing = set(random.sample(white_ball, 7))
+  red_drawing = random.choice(power_ball)
+
+  winning_numbers = {'whites': white_drawing, 'red': red_drawing}
+
+  for ticket in range(tickets_per_game):
+    total_spent += 1.35
+    my_whites = set(random.sample(white_ball, 7))
+    my_red = random.choice(power_ball)
+
+    my_numbers = {'whites': my_whites, 'red': my_red}
+
+    win_amt = calc_win_amt(my_numbers, winning_numbers)
+    earnings += win_amt
+
+print(f'Spent: ${total_spent:.2f}')
+print(f'Earnings: ${earnings:.2f}')
+
+print(json.dumps(times_won, indent=2))
