@@ -59,38 +59,28 @@ prize_values = {
     "2+P": 10.88
 }
 
-# Initialize session state for cumulative totals
+# Initialize cumulative totals in session state
 if "total_spent" not in st.session_state:
     st.session_state["total_spent"] = 0
     st.session_state["total_earnings"] = 0
 
 # User selects numbers for 'Marked Entry' game mode
-user_tickets = []
+user_blues = set()
+user_PB = None
 
 if game_mode == 'Marked Entry':
-    st.subheader("Ticket Selection")
-    for i in range(int(tickets)):
-        st.write(f"Ticket {i + 1}")
-        user_blues = st.multiselect(f"Select 7 Numbers (Ticket {i + 1}):", blue_ball, max_selections=7, key=f"ticket_{i}_blue")
-        user_PB = st.selectbox(f"Select PowerBall (Ticket {i + 1}):", power_ball, key=f"ticket_{i}_PB")
-        
-        if len(user_blues) == 7:
-            user_tickets.append({'blues': set(user_blues), 'PB': user_PB})
-        else:
-            st.warning(f"Please select exactly 7 numbers for Ticket {i + 1}")
+    st.write('Select 7 Numbers:')
+    user_blues = st.multiselect('Select 7 Numbers:', blue_ball, max_selections=7)
+    
+    if len(user_blues) != 7:
+        st.warning("Please select exactly 7 numbers.")
 
-    # Fast fill remaining tickets
-    if st.button("Fast Fill Remaining Tickets"):
-        for i in range(len(user_tickets), int(tickets)):
-            auto_blues = set(random.sample(blue_ball, 7))
-            auto_PB = random.choice(power_ball)
-            user_tickets.append({'blues': auto_blues, 'PB': auto_PB})
-        st.success("All remaining tickets have been filled automatically!")
+    user_PB = st.selectbox('Select Powerball:', power_ball)
 
 # Play button to run the game
 if st.button('Play Games'):
-    if game_mode == 'Marked Entry' and len(user_tickets) != tickets:
-        st.error("Please ensure all tickets are filled before proceeding.")
+    if game_mode == 'Marked Entry' and len(user_blues) != 7:
+        st.error("You need to select exactly 7 Standard balls to proceed.")
     else:
         # Run the game simulation
         payouts = {label: 0 for label in times_won_labels.values()}
@@ -100,16 +90,16 @@ if st.button('Play Games'):
 
             winning_numbers = {'blues': winning_blues, 'PB': winning_PB}
 
-            for ticket in range(int(tickets)):
+            for ticket in range(tickets):
                 total_spent += 1.35
 
-                # Get ticket numbers based on mode
+                # Generate random numbers for the 'Quickpick' game mode
                 if game_mode == 'QuickPick':
                     my_blues = set(random.sample(blue_ball, 7))
                     my_PB = random.choice(power_ball)
                 else:
-                    my_blues = user_tickets[ticket]['blues']
-                    my_PB = user_tickets[ticket]['PB']
+                    my_blues = set(user_blues)
+                    my_PB = user_PB
 
                 my_numbers = {'blues': my_blues, 'PB': my_PB}
 
@@ -167,7 +157,7 @@ if st.button('Play Games'):
             {
                 "Winning Combination": times_won_labels[key],
                 "Count": value,
-                "Simulated Payout": f"${value * prize_values[key]:,.2f}"
+                "Simulated Payout": value * prize_values[key]
             }
             for key, value in ordered_times_won.items()
         ]
@@ -178,8 +168,7 @@ if st.button('Play Games'):
         
         # Display table
         st.subheader("Results Table")
-        df = pd.DataFrame(table_data)
-        st.table(df)
+        st.table(table_data)
 
         # Display cumulative stats
         st.subheader("Cumulative Results")
@@ -187,6 +176,7 @@ if st.button('Play Games'):
         st.write(f"Total Earnings: ${st.session_state['total_earnings']:.2f}")
 
         # Display bar chart
+        df = pd.DataFrame(table_data)
         st.subheader("Winnings Breakdown")
         st.bar_chart(df.set_index("Winning Combination")["Count"])
 
