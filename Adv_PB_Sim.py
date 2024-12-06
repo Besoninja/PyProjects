@@ -56,7 +56,6 @@ if game_mode == 'Marked Entry':
 
     user_PB = st.selectbox('Select Powerball:', power_ball)
 
-# Play button to run the game
 if st.button('Play Games'):
     # Initialize these counters fresh each run
     total_spent = 0
@@ -73,12 +72,22 @@ if st.button('Play Games'):
         "2+P": 0
     }
 
+    # Initialize frequency trackers for drawn balls
+    standard_ball_frequency = {ball: 0 for ball in blue_ball}
+    power_ball_frequency = {ball: 0 for ball in power_ball}
+
     if game_mode == 'Marked Entry' and len(user_blues) != 7:
         st.error("You need to select exactly 7 Standard balls to proceed.")
     else:
         for _ in range(games):
+            # Draw winning numbers
             winning_blues = set(random.sample(blue_ball, 7))
             winning_PB = random.choice(power_ball)
+
+            # Track frequencies
+            for wb in winning_blues:
+                standard_ball_frequency[wb] += 1
+            power_ball_frequency[winning_PB] += 1
 
             winning_numbers = {'blues': winning_blues, 'PB': winning_PB}
 
@@ -150,14 +159,12 @@ if st.button('Play Games'):
             }
             for key, value in ordered_times_won.items()
         ]
-        
-        # Find the top 7 most frequent standard balls
+
+        # Determine the top 7 standard balls and the top 1 PowerBall
         top_7_standard = sorted(standard_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:7]
-        
-        # Find the single most frequent PowerBall
         top_1_power = sorted(power_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:1]
 
-        # Display the most frequent balls drawn from all games
+        # Display the most frequent numbers
         st.subheader("Most Frequent Numbers (from all games)")
         st.write(f"Top 7 Standard Balls: {[num for num, freq in top_7_standard]}")
         st.write(f"Top 1 PowerBall: {top_1_power[0][0] if top_1_power else 'None'}")
