@@ -151,9 +151,16 @@ if st.button('Play Games'):
             for key, value in ordered_times_won.items()
         ]
         
-        # Display winning numbers (from the last game only)
-        st.subheader("Winning Numbers")
-        st.write(f"Standard Balls: {sorted(winning_blues)}, PowerBall: {winning_PB}")
+        # Find the top 7 most frequent standard balls
+        top_7_standard = sorted(standard_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:7]
+        
+        # Find the single most frequent PowerBall
+        top_1_power = sorted(power_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:1]
+
+        # Display the most frequent balls drawn from all games
+        st.subheader("Most Frequent Numbers (from all games)")
+        st.write(f"Top 7 Standard Balls: {[num for num, freq in top_7_standard]}")
+        st.write(f"Top 1 PowerBall: {top_1_power[0][0] if top_1_power else 'None'}")
         
         # Display table
         st.subheader("Results Table")
