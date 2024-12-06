@@ -253,10 +253,10 @@ if st.button('Play Games'):
             ))
             fig_standard.update_layout(
                 polar=dict(
-                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard, tickfont=dict(color='black')),
+                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard, tickfont=dict(color='Black')),
                     radialaxis=dict(visible=True)
                 ),
-                showlegend=False
+                showlegend=True
             )
 
             # PowerBalls (1–20)
