@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 blue_ball = list(range(1, 36))
 power_ball = list(range(1, 21))
 
-# Streamlit UI to get user inputs
 st.title('Australian PowerBall Simulator')
 
 # Game Mode selection
@@ -51,14 +50,12 @@ user_PB = None
 if game_mode == 'Marked Entry':
     st.write('Select 7 Numbers:')
     user_blues = st.multiselect('Select 7 Numbers:', blue_ball, max_selections=7)
-    
     if len(user_blues) != 7:
         st.warning("Please select exactly 7 numbers.")
-
     user_PB = st.selectbox('Select Powerball:', power_ball)
 
 if st.button('Play Games'):
-    # Initialize these counters fresh each run
+    # Initialize counters fresh each run
     total_spent = 0
     earnings = 0
     times_won = {
@@ -73,16 +70,16 @@ if st.button('Play Games'):
         "2+P": 0
     }
 
-    # Initialize frequency trackers for drawn balls
+    # Initialize frequency trackers
     standard_ball_frequency = {ball: 0 for ball in blue_ball}
     power_ball_frequency = {ball: 0 for ball in power_ball}
 
+    # Validate Marked Entry
     if game_mode == 'Marked Entry' and len(user_blues) != 7:
         st.error("You need to select exactly 7 Standard balls to proceed.")
     else:
-        # Run the games
+        # Run the simulation
         for _ in range(games):
-            # Draw winning numbers
             winning_blues = set(random.sample(blue_ball, 7))
             winning_PB = random.choice(power_ball)
 
@@ -95,8 +92,7 @@ if st.button('Play Games'):
 
             for ticket in range(tickets):
                 total_spent += 1.35
-
-                # Generate random numbers for the 'Quickpick' game mode
+                # Determine user's numbers
                 if game_mode == 'QuickPick':
                     my_blues = set(random.sample(blue_ball, 7))
                     my_PB = random.choice(power_ball)
@@ -104,14 +100,11 @@ if st.button('Play Games'):
                     my_blues = set(user_blues)
                     my_PB = user_PB
 
-                my_numbers = {'blues': my_blues, 'PB': my_PB}
-
                 # Calculate winnings
-                blue_matches = len(my_numbers['blues'].intersection(winning_numbers['blues']))
-                power_matches = (my_numbers['PB'] == winning_numbers['PB'])
-                
-                win_amt = 0
+                blue_matches = len(my_blues.intersection(winning_numbers['blues']))
+                power_matches = (my_PB == winning_numbers['PB'])
 
+                win_amt = 0
                 if blue_matches == 7:
                     if power_matches:
                         win_amt = prize_values["7+P"]
@@ -148,10 +141,8 @@ if st.button('Play Games'):
 
                 earnings += win_amt
 
-        # Reorder the dictionary based on the desired hierarchy
+        # Reorder results
         ordered_times_won = OrderedDict((key, times_won[key]) for key in times_won_labels)
-
-        # Create a table-compatible data format
         table_data = [
             {
                 "Winning Combination": times_won_labels[key],
@@ -162,50 +153,48 @@ if st.button('Play Games'):
             for key, value in ordered_times_won.items()
         ]
 
-        # Determine the top 7 standard balls and the top 1 PowerBall
-        top_7_standard = sorted(standard_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:7]
-        top_1_power = sorted(power_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:1]
+        # Display the winnings breakdown outside the tabs
+        st.subheader("Totals for this run")
+        st.write(f"Total Spent: ${total_spent:.2f}")
+        st.write(f"Total Earnings: ${earnings:.2f}")
+        
+        st.subheader("Winnings Breakdown")
+        st.table(table_data)
 
-        # Prepare dataframes for frequency charts
-        df_standard = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
-        df_power = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
+        df_table = pd.DataFrame(table_data)
+        st.bar_chart(df_table.set_index("Winning Combination")["Count"])
 
-        # Sort for the "Sorted Frequency" tab (descending by frequency)
-        df_standard_sorted = df_standard.sort_values(by="Count", ascending=False)
-        df_power_sorted = df_power.sort_values(by="Count", ascending=False)
-
-        # Create the radar chart for top 7 standard balls
-        radar_categories = [str(num) for num, freq in top_7_standard]
-        radar_values = [freq for num, freq in top_7_standard]
-
-        radar_fig = go.Figure(go.Scatterpolar(
-            r=radar_values,
-            theta=radar_categories,
-            fill='toself',
-            name='Top 7 Standard Balls Frequency'
-        ))
-        radar_fig.update_layout(
-            polar=dict(radialaxis=dict(visible=True)),
-            showlegend=False
+        st.download_button(
+            "Download Results as CSV",
+            df_table.to_csv(index=False),
+            "results.csv",
+            "text/csv"
         )
 
-        # Create tabs
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Frequency Overview", "Winnings Breakdown", "Frequency Charts", "Sorted Frequency", "Radar Chart"])
+        # Create tabs for frequency visualizations
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "Frequency Overview",
+            "Frequency Charts",
+            "Sorted Frequency",
+            "Radar Chart"
+        ])
 
+        # Frequency Overview
         with tab1:
+            # Compute top 7 standard and top 1 power here
+            top_7_standard = sorted(standard_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:7]
+            top_1_power = sorted(power_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:1]
+
             st.subheader("Most Frequent Numbers (from all games)")
             st.write(f"Top 7 Standard Balls: {[num for num, freq in top_7_standard]}")
             st.write(f"Top 1 PowerBall: {top_1_power[0][0] if top_1_power else 'None'}")
 
+        # Frequency Charts
         with tab2:
-            st.subheader("Results Table")
-            st.table(table_data)
+            # Compute dataframes here
+            df_standard = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
+            df_power = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
 
-            st.subheader("Winnings Breakdown")
-            df = pd.DataFrame(table_data)
-            st.bar_chart(df.set_index("Winning Combination")["Count"])
-
-        with tab3:
             st.subheader("Frequency Charts")
             col1, col2 = st.columns(2)
             with col1:
@@ -215,7 +204,15 @@ if st.button('Play Games'):
                 st.write("PowerBall Frequency")
                 st.bar_chart(df_power.set_index("Ball")["Count"])
 
-        with tab4:
+        # Sorted Frequency
+        with tab3:
+            # Compute sorted dataframes here
+            df_standard_sorted = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
+            df_power_sorted = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
+
+            df_standard_sorted = df_standard_sorted.sort_values(by="Count", ascending=False)
+            df_power_sorted = df_power_sorted.sort_values(by="Count", ascending=False)
+
             st.subheader("Sorted Frequency (Most Frequent to Least Frequent)")
             col1, col2 = st.columns(2)
             with col1:
@@ -225,14 +222,24 @@ if st.button('Play Games'):
                 st.write("PowerBalls (Sorted)")
                 st.bar_chart(df_power_sorted.set_index("Ball")["Count"])
 
-        with tab5:
+        # Radar Chart
+        with tab4:
+            # Compute top 7 standard balls here again (for radar)
+            top_7_standard_radar = sorted(standard_ball_frequency.items(), key=lambda x: x[1], reverse=True)[:7]
+
+            radar_categories = [str(num) for num, freq in top_7_standard_radar]
+            radar_values = [freq for num, freq in top_7_standard_radar]
+
+            radar_fig = go.Figure(go.Scatterpolar(
+                r=radar_values,
+                theta=radar_categories,
+                fill='toself',
+                name='Top 7 Standard Balls Frequency'
+            ))
+            radar_fig.update_layout(
+                polar=dict(radialaxis=dict(visible=True)),
+                showlegend=False
+            )
+
             st.subheader("Frequency Radar Chart")
             st.plotly_chart(radar_fig, use_container_width=True)
-
-        # Allow users to download results as CSV
-        st.download_button(
-            "Download Results as CSV",
-            df.to_csv(index=False),
-            "results.csv",
-            "text/csv"
-        )
