@@ -241,7 +241,7 @@ if st.button('Play Games'):
         with tab4:
             st.subheader("Radial Charts")
 
-            # Standard balls (1–35)
+            # Radar chart for the Standard balls (1–35)
             categories_standard = [str(i) for i in range(1,36)]
             values_standard = [standard_ball_frequency[i] for i in range(1,36)]
 
@@ -251,15 +251,16 @@ if st.button('Play Games'):
                 fill='toself',
                 name='Standard Ball Frequency (1-35)'
             ))
+            # Radar design
             fig_standard.update_layout(
                 polar=dict(
-                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard, tickfont=dict(color='Black')),
+                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard, tickfont=dict(color='black'), direction='clockwise', rotation=90),
                     radialaxis=dict(visible=True)
                 ),
                 showlegend=False
             )
 
-            # PowerBalls (1–20)
+            # Radar chart for the PowerBalls (1–20)
             categories_power = [str(i) for i in range(1,21)]
             values_power = [power_ball_frequency[i] for i in range(1,21)]
 
@@ -269,6 +270,7 @@ if st.button('Play Games'):
                 fill='toself',
                 name='PowerBall Frequency (1-20)'
             ))
+            # Radar design
             fig_power.update_layout(
                 polar=dict(
                     angularaxis=dict(type='category', tickvals=categories_power, ticktext=categories_power, tickfont=dict(color='black'), direction='clockwise', rotation=90),
