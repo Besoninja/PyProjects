@@ -17,18 +17,6 @@ game_mode = st.radio("Game Mode:", ['QuickPick', 'Marked Entry'])
 tickets = st.number_input('Tickets:', min_value=1, value=1)
 games = st.number_input('Games:', min_value=1, value=1)
 
-# Update the labels for display
-times_won_labels = {
-    "7+P": "7 Standard Balls + PowerBall",
-    "7": "7 Standard Balls",
-    "6+P": "6 Standard Balls + PowerBall",
-    "6": "6 Standard Balls",
-    "5+P": "5 Standard Balls + PowerBall",
-    "5": "5 Standard Balls",
-    "4+P": "4 Standard Balls + PowerBall",
-    "3+P": "3 Standard Balls + PowerBall",
-    "2+P": "2 Standard Balls + PowerBall"
-}
 
 # Add prize values for simulated payouts
 prize_values = {
@@ -153,7 +141,20 @@ if st.button('Play Games'):
         # Display winning numbers (from the last game only)
         st.subheader("Winning Numbers")
         st.write(f"Standard Balls: {sorted(winning_blues)}, PowerBall: {winning_PB}")
-        
+
+	    # Update the labels for display
+	    times_won_labels = {
+	    "7+P": "7 Standard Balls + PowerBall",
+	    "7": "7 Standard Balls",
+	    "6+P": "6 Standard Balls + PowerBall",
+	    "6": "6 Standard Balls",
+	    "5+P": "5 Standard Balls + PowerBall",
+	    "5": "5 Standard Balls",
+	    "4+P": "4 Standard Balls + PowerBall",
+	    "3+P": "3 Standard Balls + PowerBall",
+	    "2+P": "2 Standard Balls + PowerBall"
+	    }
+
         # Display table
         st.subheader("Results Table")
         st.table(table_data)
