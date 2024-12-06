@@ -1,7 +1,7 @@
 # Import necessary libraries
 import random
 import streamlit as st
-import json
+from collections import OrderedDict
 
 # Define the available balls
 white_ball = list(range(1, 36))
@@ -30,6 +30,19 @@ times_won = {
     "4+P": 0,
     "3+P": 0,
     "2+P": 0
+}
+
+# Update the labels for easy user interpretability display
+times_won_labels = {
+    "7+P": "7 Standard Balls and 1 PowerBall",
+    "7": "7 Standard Balls",
+    "6+P": "6 Standard Balls and 1 PowerBall",
+    "6": "6 Standard Balls",
+    "5+P": "5 Standard Balls and 1 PowerBall",
+    "5": "5 Standard Balls",
+    "4+P": "4 Standard Balls and 1 PowerBall",
+    "3+P": "3 Standard Balls and 1 PowerBall",
+    "2+P": "2 Standard Balls and 1 PowerBall"
 }
 
 # Marked Entry number selection
@@ -112,7 +125,13 @@ if st.button('Play Games'):
 
                 earnings += win_amt
 
-        # Display results
+        # Reorder the dictionary based on the desired hierarchy
+        ordered_times_won = OrderedDict((key, times_won[key]) for key in times_won_labels)
+
+        # Display the results with updated labels
+        display_results = {times_won_labels[key]: value for key, value in ordered_times_won.items()}
+        
+        # Results
         st.write(f"Spent: ${total_spent:.2f}")
         st.write(f"Earnings: ${earnings:.2f}")
-        st.json(times_won)
+        st.json(display_results)
