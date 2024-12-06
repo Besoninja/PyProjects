@@ -50,11 +50,11 @@ user_blues = set()
 user_PB = None
 
 if game_mode == 'Marked Entry':
-    st.write('Select 7 Numbers:')
-    user_blues = st.multiselect('Select 7 Numbers:', blue_ball, max_selections=7)
+    st.write('Select 7 Standard Balls:')
+    user_blues = st.multiselect('Select 7 Standard Balls:', blue_ball, max_selections=7)
     
     if len(user_blues) != 7:
-        st.warning("Please select exactly 7 numbers.")
+        st.warning("Please select exactly 7 Standard Balls.")
 
     user_PB = st.selectbox('Select Powerball:', power_ball)
 
