@@ -157,7 +157,7 @@ if st.button('Play Games'):
             {
                 "Winning Combination": times_won_labels[key],
                 "Count": value,
-                "Simulated Payout": value * prize_values[key]
+                "Simulated Payout": f"${value * prize_values[key]:,.2f}"
             }
             for key, value in ordered_times_won.items()
         ]
