@@ -79,7 +79,7 @@ if game_mode == 'Marked Entry':
         else:
             st.warning(f"Please select exactly 7 numbers for Ticket {i + 1}")
 
-# Fast fill remaining tickets
+    # Fast fill remaining tickets
     if st.button("Fast Fill Remaining Tickets"):
         for i in range(len(user_tickets), int(tickets)):
             auto_blues = set(random.sample(blue_ball, 7))
@@ -98,12 +98,12 @@ if st.button('Play Games'):
             winning_blues = set(random.sample(blue_ball, 7))
             winning_PB = random.choice(power_ball)
 
-winning_numbers = {'blues': winning_blues, 'PB': winning_PB}
+            winning_numbers = {'blues': winning_blues, 'PB': winning_PB}
 
-for ticket in range(int(tickets)):
+            for ticket in range(int(tickets)):
                 total_spent += 1.35
 
-# Get ticket numbers based on mode
+                # Get ticket numbers based on mode
                 if game_mode == 'QuickPick':
                     my_blues = set(random.sample(blue_ball, 7))
                     my_PB = random.choice(power_ball)
@@ -111,15 +111,15 @@ for ticket in range(int(tickets)):
                     my_blues = user_tickets[ticket]['blues']
                     my_PB = user_tickets[ticket]['PB']
 
-my_numbers = {'blues': my_blues, 'PB': my_PB}
+                my_numbers = {'blues': my_blues, 'PB': my_PB}
 
-# Calculate winnings
+                # Calculate winnings
                 blue_matches = len(my_numbers['blues'].intersection(winning_numbers['blues']))
                 power_matches = my_numbers['PB'] == winning_numbers['PB']
                 
                 win_amt = 0
 
-if blue_matches == 7:
+                if blue_matches == 7:
                     if power_matches:
                         win_amt = prize_values["7+P"]
                         times_won['7+P'] += 1
@@ -153,16 +153,16 @@ if blue_matches == 7:
                         win_amt = prize_values["2+P"]
                         times_won['2+P'] += 1
 
-earnings += win_amt
+                earnings += win_amt
 
-# Update session totals
+        # Update session totals
         st.session_state["total_spent"] += total_spent
         st.session_state["total_earnings"] += earnings
 
-# Reorder the dictionary based on the desired hierarchy
+        # Reorder the dictionary based on the desired hierarchy
         ordered_times_won = OrderedDict((key, times_won[key]) for key in times_won_labels)
 
-# Create a table-compatible data format
+        # Create a table-compatible data format
         table_data = [
             {
                 "Winning Combination": times_won_labels[key],
@@ -181,16 +181,16 @@ earnings += win_amt
         df = pd.DataFrame(table_data)
         st.table(df)
 
-# Display cumulative stats
+        # Display cumulative stats
         st.subheader("Cumulative Results")
         st.write(f"Total Spent: ${st.session_state['total_spent']:.2f}")
         st.write(f"Total Earnings: ${st.session_state['total_earnings']:.2f}")
 
-# Display bar chart
+        # Display bar chart
         st.subheader("Winnings Breakdown")
         st.bar_chart(df.set_index("Winning Combination")["Count"])
 
-# Allow users to download results as CSV
+        # Allow users to download results as CSV
         st.download_button(
             "Download Results as CSV",
             df.to_csv(index=False),
