@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 from collections import OrderedDict
 import plotly.graph_objects as go
+import altair as alt
 
 # Define the available balls
 blue_ball = list(range(1, 36))
@@ -153,7 +154,7 @@ if st.button('Play Games'):
             for key, value in ordered_times_won.items()
         ]
 
-        # Display the winnings breakdown outside the tabs
+        # Display the totals and table
         st.subheader("Totals for this run")
         st.write(f"Total Spent: ${total_spent:.2f}")
         st.write(f"Total Earnings: ${earnings:.2f}")
@@ -208,7 +209,7 @@ if st.button('Play Games'):
                 st.write("PowerBall Frequency")
                 st.bar_chart(df_power.set_index("Ball")["Count"])
 
-        # Sorted Frequency
+        # Sorted Frequency (Corrected)
         with tab3:
             df_standard_sorted = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
             df_power_sorted = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
@@ -218,17 +219,25 @@ if st.button('Play Games'):
             df_power_sorted = df_power_sorted.sort_values(by="Count", ascending=False)
 
             st.subheader("Sorted Frequency (Most Frequent to Least Frequent)")
-            col1, col2 = st.columns(2)
 
+            col1, col2 = st.columns(2)
             with col1:
                 st.write("Standard Balls (Sorted)")
-                st.bar_chart(df_standard_sorted.set_index("Ball")["Count"])
+                chart_standard = alt.Chart(df_standard_sorted).mark_bar().encode(
+                    x=alt.X('Ball:N', sort=None),  # sort=None ensures order of data is respected
+                    y='Count:Q'
+                )
+                st.altair_chart(chart_standard, use_container_width=True)
 
             with col2:
                 st.write("PowerBalls (Sorted)")
-                st.bar_chart(df_power_sorted.set_index("Ball")["Count"])
+                chart_power = alt.Chart(df_power_sorted).mark_bar().encode(
+                    x=alt.X('Ball:N', sort=None),
+                    y='Count:Q'
+                )
+                st.altair_chart(chart_power, use_container_width=True)
 
-        # Radial Charts
+        # Radial Charts (Corrected)
         with tab4:
             st.subheader("Radial Charts")
 
@@ -243,7 +252,10 @@ if st.button('Play Games'):
                 name='Standard Ball Frequency (1-35)'
             ))
             fig_standard.update_layout(
-                polar=dict(radialaxis=dict(visible=True)),
+                polar=dict(
+                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard),
+                    radialaxis=dict(visible=True)
+                ),
                 showlegend=False
             )
 
@@ -258,7 +270,10 @@ if st.button('Play Games'):
                 name='PowerBall Frequency (1-20)'
             ))
             fig_power.update_layout(
-                polar=dict(radialaxis=dict(visible=True)),
+                polar=dict(
+                    angularaxis=dict(type='category', tickvals=categories_power, ticktext=categories_power),
+                    radialaxis=dict(visible=True)
+                ),
                 showlegend=False
             )
 
