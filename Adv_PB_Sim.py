@@ -195,7 +195,7 @@ if st.button('Play Games'):
             st.write(f"Top 7 Standard Balls: {[num for num, freq in top_7_standard]}")
             st.write(f"Top 1 PowerBall: {top_1_power[0][0] if top_1_power else 'None'}")
 
-        # Frequency Charts
+        # Frequency Histogram
         with tab2:
             df_standard = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
             df_power = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
@@ -209,7 +209,7 @@ if st.button('Play Games'):
                 st.write("PowerBall Frequency")
                 st.bar_chart(df_power.set_index("Ball")["Count"])
 
-        # Sorted Frequency (Corrected)
+        # Sorted Frequency Histogram - Using altair module
         with tab3:
             df_standard_sorted = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
             df_power_sorted = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
@@ -237,7 +237,7 @@ if st.button('Play Games'):
                 )
                 st.altair_chart(chart_power, use_container_width=True)
 
-        # Radial Charts (Corrected)
+        # Radial Charts - Using plotly.graph_objects.Scatterpolar
         with tab4:
             st.subheader("Radial Charts")
 
@@ -253,7 +253,7 @@ if st.button('Play Games'):
             ))
             fig_standard.update_layout(
                 polar=dict(
-                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard),
+                    angularaxis=dict(type='category', tickvals=categories_standard, ticktext=categories_standard, tickfont=dict(color='black')),
                     radialaxis=dict(visible=True)
                 ),
                 showlegend=False
@@ -271,7 +271,7 @@ if st.button('Play Games'):
             ))
             fig_power.update_layout(
                 polar=dict(
-                    angularaxis=dict(type='category', tickvals=categories_power, ticktext=categories_power),
+                    angularaxis=dict(type='category', tickvals=categories_power, ticktext=categories_power, tickfont=dict(color='black')),
                     radialaxis=dict(visible=True)
                 ),
                 showlegend=False
