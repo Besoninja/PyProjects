@@ -233,7 +233,7 @@ if st.button('Play Games'):
                 st.write("PowerBalls (Sorted)")
                 chart_power = alt.Chart(df_power_sorted).mark_bar().encode(
                     x=alt.X('Ball:N', sort=None),
-                    y='Count:Q'
+                    y=alt.Y('Count:Q', axis=alt.Axis(format='d'))  # Ensure only integers are displayed
                 )
                 st.altair_chart(chart_power, use_container_width=True)
 
