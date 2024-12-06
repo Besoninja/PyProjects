@@ -1,4 +1,3 @@
-# Import necessary libraries
 import random
 import streamlit as st
 import pandas as pd
@@ -18,22 +17,7 @@ game_mode = st.radio("Game Mode:", ['QuickPick', 'Marked Entry'])
 tickets = st.number_input('Tickets:', min_value=1, value=1)
 games = st.number_input('Games:', min_value=1, value=1)
 
-# Variables to track the total spent and earnings
-total_spent = 0
-earnings = 0
-times_won = {
-    "7+P": 0,
-    "7": 0,
-    "6+P": 0,
-    "6": 0,
-    "5+P": 0,
-    "5": 0,
-    "4+P": 0,
-    "3+P": 0,
-    "2+P": 0
-}
-
-# Update the labels for easy user interpretability display
+# Update the labels for display
 times_won_labels = {
     "7+P": "7 Standard Balls + PowerBall",
     "7": "7 Standard Balls",
@@ -59,11 +43,6 @@ prize_values = {
     "2+P": 10.88
 }
 
-# Initialize cumulative totals in session state
-if "total_spent" not in st.session_state:
-    st.session_state["total_spent"] = 0
-    st.session_state["total_earnings"] = 0
-
 # User selects numbers for 'Marked Entry' game mode
 user_blues = set()
 user_PB = None
@@ -79,11 +58,24 @@ if game_mode == 'Marked Entry':
 
 # Play button to run the game
 if st.button('Play Games'):
+    # Initialize these counters fresh each run
+    total_spent = 0
+    earnings = 0
+    times_won = {
+        "7+P": 0,
+        "7": 0,
+        "6+P": 0,
+        "6": 0,
+        "5+P": 0,
+        "5": 0,
+        "4+P": 0,
+        "3+P": 0,
+        "2+P": 0
+    }
+
     if game_mode == 'Marked Entry' and len(user_blues) != 7:
         st.error("You need to select exactly 7 Standard balls to proceed.")
     else:
-        # Run the game simulation
-        payouts = {label: 0 for label in times_won_labels.values()}
         for _ in range(games):
             winning_blues = set(random.sample(blue_ball, 7))
             winning_PB = random.choice(power_ball)
@@ -105,7 +97,7 @@ if st.button('Play Games'):
 
                 # Calculate winnings
                 blue_matches = len(my_numbers['blues'].intersection(winning_numbers['blues']))
-                power_matches = my_numbers['PB'] == winning_numbers['PB']
+                power_matches = (my_numbers['PB'] == winning_numbers['PB'])
                 
                 win_amt = 0
 
@@ -145,10 +137,6 @@ if st.button('Play Games'):
 
                 earnings += win_amt
 
-        # Update session totals
-        st.session_state["total_spent"] += total_spent
-        st.session_state["total_earnings"] += earnings
-
         # Reorder the dictionary based on the desired hierarchy
         ordered_times_won = OrderedDict((key, times_won[key]) for key in times_won_labels)
 
@@ -162,7 +150,7 @@ if st.button('Play Games'):
             for key, value in ordered_times_won.items()
         ]
         
-        # Display winning numbers
+        # Display winning numbers (from the last game only)
         st.subheader("Winning Numbers")
         st.write(f"Standard Balls: {sorted(winning_blues)}, PowerBall: {winning_PB}")
         
@@ -170,10 +158,10 @@ if st.button('Play Games'):
         st.subheader("Results Table")
         st.table(table_data)
 
-        # Display cumulative stats
-        st.subheader("Cumulative Results")
-        st.write(f"Total Spent: ${st.session_state['total_spent']:.2f}")
-        st.write(f"Total Earnings: ${st.session_state['total_earnings']:.2f}")
+        # Display totals
+        st.subheader("Totals for this run")
+        st.write(f"Total Spent: ${total_spent:.2f}")
+        st.write(f"Total Earnings: ${earnings:.2f}")
 
         # Display bar chart
         df = pd.DataFrame(table_data)
