@@ -128,10 +128,15 @@ if st.button('Play Games'):
         # Reorder the dictionary based on the desired hierarchy
         ordered_times_won = OrderedDict((key, times_won[key]) for key in times_won_labels)
 
-        # Display the results with updated labels
-        display_results = {times_won_labels[key]: value for key, value in ordered_times_won.items()}
+         # Create a table-compatible data format
+        table_data = [
+            {"Winning Combination": times_won_labels[key], "Count": value}
+            for key, value in ordered_times_won.items()
+        ]
         
         # Results
         st.write(f"Spent: ${total_spent:.2f}")
         st.write(f"Earnings: ${earnings:.2f}")
-        st.json(display_results)
+
+         # Display the table
+        st.table(table_data)
