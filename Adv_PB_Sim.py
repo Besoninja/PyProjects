@@ -144,6 +144,7 @@ if st.button('Play Games'):
         table_data = [
             {
                 "Winning Combination": times_won_labels[key],
+                "Potential Earnings": prize_values[value],
                 "Count": value,
                 "Simulated Payout": f"${value * prize_values[key]:,.2f}"
             }
