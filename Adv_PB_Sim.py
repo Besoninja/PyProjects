@@ -214,7 +214,7 @@ if st.button('Play Games'):
             df_standard_sorted = pd.DataFrame(list(standard_ball_frequency.items()), columns=["Ball", "Count"])
             df_power_sorted = pd.DataFrame(list(power_ball_frequency.items()), columns=["Ball", "Count"])
 
-            # Sort descending by "Count"
+            # Sort the balls in a descending fashion by "Count"
             df_standard_sorted = df_standard_sorted.sort_values(by="Count", ascending=False)
             df_power_sorted = df_power_sorted.sort_values(by="Count", ascending=False)
 
@@ -224,8 +224,8 @@ if st.button('Play Games'):
             with col1:
                 st.write("Standard Balls (Sorted)")
                 chart_standard = alt.Chart(df_standard_sorted).mark_bar().encode(
-                    x=alt.X('Ball:N', sort=None),  # sort=None ensures order of data is respected
-                    y='Count:Q'
+                    x=alt.X('Ball:N', sort=None),  # 'N'=Nominal, 'sort=None' ensures the order, as described above, is maintained
+                    y=alt.Y('Count:Q', axis=alt.Axis(format='d'))  # Ensure only integers are displayed
                 )
                 st.altair_chart(chart_standard, use_container_width=True)
 
@@ -233,7 +233,7 @@ if st.button('Play Games'):
                 st.write("PowerBalls (Sorted)")
                 chart_power = alt.Chart(df_power_sorted).mark_bar().encode(
                     x=alt.X('Ball:N', sort=None),
-                    y=alt.Y('Count:Q', axis=alt.Axis(format='d'))  # Ensure only integers are displayed
+                    y=alt.Y('Count:Q', axis=alt.Axis(format='d'))
                 )
                 st.altair_chart(chart_power, use_container_width=True)
 
